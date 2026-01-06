@@ -1,0 +1,23 @@
+.hpc-container{
+    height: auto;
+    max-width: 200px;
+    border-radius: 8px;
+    background-color: var(--secondary-color);
+    padding: 1rem 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.hpc-container:hover{
+    background-color: var(--hover-color);
+}
+
+.hpc-container p {
+    white-space: nowrap;
+}

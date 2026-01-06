@@ -1,0 +1,41 @@
+.home-container{
+    width: 100%;
+    padding: 1rem 3rem;
+}
+
+.project-section{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.project-section .header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.project-section .header button{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: 0.2s ease-in-out;
+}
+
+.project-section .header button:hover{
+    background-color: var(--hover-color);
+}
+
+.project-section .header button img{
+    height: 1rem;
+}
+
+.project-cards-container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}

@@ -1,0 +1,135 @@
+:root{
+  --primary-color: #fdf9ed;
+  --secondary-color: #b9590a;
+  --hover-color: #7c4f27;
+  --light-color: #995924;
+  --dark-color: #36271b;
+  --border-color: #b4b4b4;
+}
+
+@font-face {
+  font-family: 'ns-reg';
+  src: url('../fonts/NotoSans/NotoSans-Regular.ttf');
+}
+
+
+@font-face {
+  font-family: 'ns-med';
+  src: url('../fonts/NotoSans/NotoSans-Medium.ttf');
+}
+
+
+@font-face {
+  font-family: 'ns-bold';
+  src: url('../fonts/NotoSans/NotoSans-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'r-reg';
+  src: url('../fonts/Roboto/Roboto-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'r-med';
+  src: url('../fonts/Roboto/Roboto-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'r-bold';
+  src: url('../fonts/Roboto/Roboto-Bold.ttf');
+}
+
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'ns-reg';
+  list-style-type: none;
+}
+
+button{
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+a{
+  color: black;
+  text-decoration: none;
+}
+
+input{
+  border: none;
+  border-radius: 2px;
+}
+
+input
+
+body{
+  background-color: var(--primary-color);
+}
+
+.text-primary{
+  color: var(--primary-color);
+}
+
+.text-secondary{
+  color: var(--secondary-color);
+}
+
+.text-light{
+  color: var(--light-color);
+}
+
+.text-hover{
+  color: var(--hover-color);
+}
+
+.text-dark{
+  color: var(--dark-color);
+}
+
+.bg-primary{
+  background-color: var(--primary-color);
+}
+
+.bg-secondary{
+  background-color: var(--secondary-color);
+}
+
+.bg-light{
+  background-color: var(--light-color);
+}
+
+.bg-dark{
+  background-color: var(--dark-color);
+}
+
+.bg-hover{
+  background-color: var(--hover-color);
+}
+
+.text-xsm{
+  font-size: 1rem;
+}
+
+.text-sm{
+  font-size: 1.2rem;
+}
+
+.text-med{
+  font-size: 2rem;
+}
+
+.text-lg{
+  font-size: 3rem;
+}
+
+.text-thin{
+  font-family: 'ns-med';
+}
+
+.text-bold{
+  font-family: 'ns-bold';
+}

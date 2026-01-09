@@ -1,0 +1,22 @@
+.custom-dropdown-container{
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    height: auto;
+    width: 250px;
+    background-color: white;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.custom-dropdown-container div {
+    width: 100%;
+    border-radius: 10px;
+    padding: 0.2rem;
+}
+
+.custom-dropdown-container div:hover {
+    background-color: rgba(0, 0, 0, 0.171);
+}

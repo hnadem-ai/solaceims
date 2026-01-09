@@ -18,13 +18,13 @@ export default function New(){
             <section className='create-section'>
                 <h1 className='text-dark text-lg text-bold'>What do you want to <span className='text-secondary'>Create</span>?</h1>
                 <div className='btns-container'>
-                    <button className='text-sm' onClick={()=> setFormType('PROJECT')}>Project</button>
-                    <button className='text-sm' onClick={()=> setFormType('BANK')}>Bank</button>
-                    <button className='text-sm' onClick={()=> setFormType('BILL')}>Bill</button>
-                    <button className='text-sm' onClick={()=> setFormType('VENDOR')}>Vendor</button>
-                    <button className='text-sm' onClick={()=> setFormType('SALE')}>Sale</button>
-                    <button className='text-sm' onClick={()=> setFormType('CREDIT_RECEIPT')}>Credit Receipt</button>
-                    <button className='text-sm' onClick={()=> setFormType('DEBIT_VOUCHER')}>Debit Voucher</button>
+                    <button className={formType === 'PROJECT' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('PROJECT')}>Project</button>
+                    <button className={formType === 'BANK' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('BANK')}>Bank</button>
+                    <button className={formType === 'BILL' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('BILL')}>Bill</button>
+                    <button className={formType === 'VENDOR' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('VENDOR')}>Vendor</button>
+                    <button className={formType === 'SALE' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('SALE')}>Sale</button>
+                    <button className={formType === 'CREDIT_RECEIPT' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('CREDIT_RECEIPT')}>Credit Receipt</button>
+                    <button className={formType === 'DEBIT_VOUCHER' ? 'text-sm active-creaete-new-btn' : 'text-sm'} onClick={()=> setFormType('DEBIT_VOUCHER')}>Debit Voucher</button>
                 </div>
                 {
                     formType === 'PROJECT' ? (

@@ -19,6 +19,87 @@ app.use(cors({
 }))
 app.use(express.json());
 
+// APIs (method: 'GET')
+
+app.get("/api/project", async (req, res) => {
+  try{
+    const projects = await Project.find();
+    if(projects.length === 0) return res.status(400).json({message: 'No Projects were found!'});
+    return res.status(200).json({projects});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+app.get("/api/bank", async (req, res) => {
+  try{
+    const banks = await Bank.find();
+    if(banks.length === 0) return res.status(400).json({message: 'No Banks were found!'});
+    return res.status(200).json({banks});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+app.get("/api/bill", async (req, res) => {
+  try{
+    const bills = await Bill.find();
+    if(bills.length === 0) return res.status(400).json({message: 'No Bills were found!'});
+    return res.status(200).json({bills});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+app.get("/api/vendor", async (req, res) => {
+  try{
+    const vendors = await Vendor.find();
+    if(vendors.length === 0) return res.status(400).json({message: 'No Vendors were found!'});
+    return res.status(200).json({vendors});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+app.get("/api/sale", async (req, res) => {
+  try{
+    const sales = await Sale.find();
+    if(sales.length === 0) return res.status(400).json({message: 'No Sales were found!'});
+    return res.status(200).json({sales});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+app.get("/api/debit-voucher", async (req, res) => {
+  try{
+    const debitVouchers = await DebitVoucher.find();
+    if(debitVouchers.length === 0) return res.status(400).json({message: 'No Debit Vouchers were found!'});
+    return res.status(200).json({debitVouchers});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+app.get("/api/credit-receipt", async (req, res) => {
+  try{
+    const creditReceipts = await CreditReceipt.find();
+    if(creditReceipts.length === 0) return res.status(400).json({message: 'No Credit Receipts were found!'});
+    return res.status(200).json({creditReceipts});
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({message: 'Internal Server Error!'});
+  }
+});
+
+// APIs (method: 'POST')
+
 app.post("/api/project", async (req, res) => {
   try {
     const project = await Project.create(req.body);

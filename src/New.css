@@ -27,6 +27,11 @@
     color: var(--primary-color);
 }
 
+.active-creaete-new-btn{
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
 @media (max-width: 900px) {
   .new-container{
     padding: 1rem 1rem;

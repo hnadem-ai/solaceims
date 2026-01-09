@@ -42,8 +42,7 @@ const projectSchema = new mongoose.Schema(
           required: true,
         },
         utilities: {
-          type: String,
-          trim: true,
+          type: Number,
         },
         remarks: {
           type: String,
@@ -55,6 +54,7 @@ const projectSchema = new mongoose.Schema(
       type: String,
       trim: true,
       enum: ["future", "ongoing", "completed"],
+      default: 'ongoing',
     },
   },
   {

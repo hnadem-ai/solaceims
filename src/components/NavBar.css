@@ -76,6 +76,10 @@
     height: 1rem;
 }
 
+.hidden{
+    display: none;
+}
+
 @keyframes slideIn {
     0%{
         left: -900px;
@@ -88,15 +92,38 @@
 @media (max-width: 900px){
     .nav-container ul{
         flex-direction: column;
-        position: absolute;
+        position: fixed;
         top: 0;
         left: -900px;
-        background-color: black;
+        background-color: var(--primary-color);
         height: 100vh;
-        width: 70%;
+        width: 80%;
+        z-index: 2;
+        padding: 1rem 1rem;
+        gap: 0px;
     }
+
+    .nav-container ul li{
+        padding: 8px 0;
+        /**border-bottom: 1px solid var(--secondary-color);**/
+    }
+
+    .active-tab {
+        border: none;
+    }
+
     .nav-container .menu-btn{
         display: grid;
         place-items: center;
+    }
+    .opaque{
+        background-color: rgba(27, 27, 27, 0.5);
+        backdrop-filter: blur(3px);
+        height: 100dvh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1;
     }
 }

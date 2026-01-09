@@ -28,7 +28,7 @@ export default function NavBar({page}){
     return (
         <nav className='nav-container'>
             <header className='nav-header'>
-                <h1 className='text-med text-dark'>Solace<span className='text-secondary text-bold'>IMS</span></h1>
+                <h1 className='text-med text-lg text-dark'>Solace<span className='text-secondary text-bold'>IMS</span></h1>
             </header>
             <ul ref={ulRef} className={showUl ? 'show-ul' : ''}>
                 <li className={page === 'home' ? 'text-sm active-tab' : 'text-sm'}><a href='/'>Home</a></li>
@@ -36,6 +36,7 @@ export default function NavBar({page}){
                 <li className='text-sm'><a href='#'>Transactions</a></li>
                 <li className='text-sm'><a href='#'>Notifications</a></li>
             </ul>
+            <div className={showUl ? 'opaque' : 'hidden opaque'}></div>
             <div className='nav-btns'>
                 <button className='bg-secondary text-xsm text-primary notification'><img src={notification} alt="Notification" /></button>
                 <button className='bg-secondary text-xsm text-primary search'><img src={search} alt="Search" />Search</button>

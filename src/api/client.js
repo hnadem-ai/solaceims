@@ -2,7 +2,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 
 export async function callAPI(
   endpoint,
-  { method = 'GET', body, token, headers = {} } = {}
+  { method = 'GET', body, token, headers = {}, onError } = {}
 ) {
   const config = {
     method,
@@ -24,6 +24,14 @@ export async function callAPI(
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
+    if (typeof onError === 'function') {
+      onError({
+        status: res.status,
+        message: data?.message || 'Request failed',
+        data,
+      });
+    }
+    
     throw {
       status: res.status,
       message: data?.message || 'Request failed',

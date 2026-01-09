@@ -1,6 +1,7 @@
 .home-container{
     width: 100%;
     padding: 1rem 3rem;
+    background-color: var(--primary-color);
 }
 
 .project-section{
@@ -38,4 +39,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .home-container{
+    padding: 1rem 1rem;
+  }
 }

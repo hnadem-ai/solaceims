@@ -39,7 +39,7 @@ export default function NavBar({page}){
             <div className={showUl ? 'opaque' : 'hidden opaque'}></div>
             <div className='nav-btns'>
                 <button className='bg-secondary text-xsm text-primary notification'><img src={notification} alt="Notification" /></button>
-                <button className='bg-secondary text-xsm text-primary search'><img src={search} alt="Search" />Search</button>
+                <a href='/search'><button className='bg-secondary text-xsm text-dark search'><img src={search} alt="Search" />Search</button></a>
             </div>
             <button className='menu-btn' ref={menuBtnRef} onClick={() => setShowUl(prev => !prev)}><img src={menu} alt="Menu Burger" /></button>
         </nav>

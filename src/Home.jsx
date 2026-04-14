@@ -11,7 +11,7 @@ export default function Home(){
             <section className='project-section'>
                 <div className='header'>
                     <h1 className='text-lg text-bold text-dark'>PROJECTS<span className='text-secondary'>.</span></h1>
-                    <button className='text-xsm text-primary'><img src={plus} alt='plus'/>CREATE NEW</button>
+                    <button className='text-xsm text-dark'><img src={plus} alt='plus'/>CREATE NEW</button>
                 </div>
                 <div className='project-cards-container'>
                     <ProjectCard project={{

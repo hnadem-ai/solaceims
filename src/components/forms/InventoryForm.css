@@ -1,0 +1,55 @@
+.inventory-form-container{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inventory-form-container .input-container{
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.inventory-form-container .input-container input{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #32303d;
+    color: var(--dark-color);
+    padding: 0.2rem;
+}
+
+.inventory-form-container .input-container textarea{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 0.2rem;
+    overflow: hidden;
+    scrollbar-width: 0;
+    resize: none;
+    min-width: 100px;
+    white-space: nowrap;
+    background-color: #32303d;
+    color: var(--dark-color);
+}
+
+.inventory-form-container .btn-container{
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.inventory-form-container .btn-container button{
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: 0.2s ease-in-out;
+}
+
+.inventory-form-container .btn-container button:hover{
+    background-color: var(--hover-color);
+}

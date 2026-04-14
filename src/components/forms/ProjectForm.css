@@ -1,3 +1,123 @@
-.input-wrapper{
+.project-form-container{
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.project-details{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-details > div{
+    display: flex;
+    gap: 10px;
+}
+
+.project-details input {
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 0.2rem;
+    background-color: #32303d;
+    color: var(--dark-color);
+}
+
+.project-form-container .input-wrapper{
     position: relative;
+    flex: 1 1;
+    display: flex;
+}
+
+.project-details textarea{
+    width: 350px;
+    height: 200px;
+    font-size: 1rem;
+    resize: none;
+    border: 1px solid var(--border-color);
+    background-color: #32303d;
+    color: var(--dark-color);
+    border-radius: 5px;
+    padding: 0.2rem;
+}
+
+.inventory-container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.inventory-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.inventory-header button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 30px;
+    transition: 0.2s ease-in-out;
+    height: 35px;
+    width: 35px;
+}
+
+.inventory-header button:hover{
+    background-color: var(--hover-color);
+}
+
+.inventory-header button img{
+    height: 1.2rem;
+}
+
+.inventory-container .added-inventory-container{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.inventory-container .added-inventory-container .added-inventory{
+    display: flex;
+    height: auto;
+    overflow: hidden;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.inventory-container .added-inventory-container .added-inventory button img{
+    height: 40px;
+    padding: 0.4rem;
+    display: grid;
+    place-items: center;
+}
+
+
+.inventory-container .added-inventory-container .added-inventory p {
+    flex: 1 1;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    gap: 4px;
+    background-color: #32303d;
+}
+
+.project-form-container > button {
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 5px;
+    transition: 0.2s ease-in-out;
+    width: fit-content;
+}
+
+.project-form-container > button:hover {
+    background-color: var(--hover-color);
 }

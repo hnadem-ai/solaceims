@@ -4,19 +4,32 @@
     left: 0;
     margin-top: 0.5rem;
     height: auto;
+    max-height: 500px;
     width: 250px;
-    background-color: white;
+    background-color: #32303d;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4);
     border-radius: 10px;
     padding: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 2;
+    scrollbar-width: thin;
+    scrollbar-track-color: transparent;
 }
 
 .custom-dropdown-container div {
     width: 100%;
     border-radius: 10px;
     padding: 0.2rem;
+    max-width: 100%;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .custom-dropdown-container div:hover {
     background-color: rgba(0, 0, 0, 0.171);
+}
+
+.custom-dropdown-container div h1{
+    text-overflow: ellipsis;
 }

@@ -51,7 +51,7 @@ const debitVoucherSchema = new mongoose.Schema(
     payStatus: {
       type: String,
       required: true,
-      enum: ["paid", "in-progress", "unpaid"],
+      enum: ["Paid", "Due", "Unpaid"],
     },
     heads: [
       {

@@ -16,11 +16,6 @@ const billSchema = new mongoose.Schema(
       ref: "Head",
       required: true,
     },
-    subHead: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "SubHead",
-      required: true,
-    },
     vendorBillNo: {
       type: String,
       required: true,
@@ -32,14 +27,15 @@ const billSchema = new mongoose.Schema(
     },
     items: [
       {
-        itemName: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "SubHead",
+        item: {
+          type: String,
+          trim: true,
           required: true,
         },
-        units: {
-          type: Number,
+        unit: {
+          type: String,
           required: true,
+          trim: true
         },
         rate: {
           type: Number,

@@ -16,10 +16,15 @@ const creditReceiptSchema = mongoose.Schema(
       ref: "Project",
       required: true,
     },
-    sale: {
+    creditor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Sale",
+      refPath: "targetModel",
       required: true,
+    },
+    targetModel: {
+      type: String,
+      required: true,
+      enum: ["Project", "Sale"],
     },
     amount: {
       type: Number,
@@ -35,12 +40,11 @@ const creditReceiptSchema = mongoose.Schema(
       trim: true,
     },
     instrumentDate: Date,
-    instrumentNo: {
+    creditorBank: {
       type: String,
       required: true,
-      trim: true,
     },
-    description: {
+    comments: {
       type: String,
       trim: true,
     },

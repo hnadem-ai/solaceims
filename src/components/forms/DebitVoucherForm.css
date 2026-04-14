@@ -1,0 +1,269 @@
+.debit-voucher-form-container{
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.debit-voucher-form-container .inputs-container{
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.debit-voucher-form-container .inputs-container label{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 4px;
+}
+
+.debit-voucher-form-container .inputs-container input{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #32303d;
+    color: var(--dark-color);
+    padding: 0.2rem;
+}
+
+.debit-voucher-form-container .input-wrapper{
+    position: relative;
+    flex: 1 1;
+    display: flex;
+}
+
+.heads-sub-heads-container{
+    display: flex;
+    gap: 1rem;
+}
+
+.heads-container{
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.heads-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.heads-header button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 30px;
+    transition: 0.2s ease-in-out;
+    height: 30px;
+    width: 30px;
+}
+
+.heads-header button:hover{
+    background-color: var(--hover-color);
+}
+
+.heads-header button img{
+    height: 1rem;
+}
+
+.heads-container .added-heads-container{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.heads-container .added-heads-container .added-head{
+    display: flex;
+    color: var(--dark-color);
+    height: 40px;
+    border-radius: 10px;
+    overflow: hidden;
+    gap: 5px;
+}
+
+.heads-container .added-heads-container .added-head button img{
+    height: 100%;
+    padding: 0.5rem;
+    display: grid;
+    place-items: center;
+}
+
+
+.heads-container .added-heads-container .added-head p {
+    flex: 1 1;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border: 1px solid var(--border-color);
+    background-color: #32303d;
+    border-radius: 10px;
+    gap: 4px;
+}
+
+
+.head-form-container{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.head-form-container .input-container{
+    display: flex;
+    gap: 5px;
+}
+
+.head-form-container .input-container input{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #32303d;
+    color: var(--dark-color);
+    padding: 0.2rem;
+}
+
+.head-form-container .btn-container{
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.head-form-container .btn-container button{
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: 0.2s ease-in-out;
+}
+
+.head-form-container .btn-container button:hover{
+    background-color: var(--hover-color);
+}
+
+.sub-heads-container{
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sub-heads-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.sub-heads-header button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 30px;
+    transition: 0.2s ease-in-out;
+    height: 30px;
+    width: 30px;
+}
+
+.sub-heads-header button:hover{
+    background-color: var(--hover-color);
+}
+
+.sub-heads-header button img{
+    height: 1rem;
+}
+
+.sub-heads-container .added-sub-heads-container{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sub-heads-container .added-sub-heads-container .added-sub-head{
+    display: flex;
+    color: var(--dark-color);
+    height: 40px;
+    border-radius: 10px;
+    overflow: hidden;
+    gap: 5px;
+}
+
+.sub-heads-container .added-sub-heads-container .added-sub-head button img{
+    height: 100%;
+    padding: 0.5rem;
+    display: grid;
+    place-items: center;
+}
+
+
+.sub-heads-container .added-sub-heads-container .added-sub-head p {
+    flex: 1 1;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border: 1px solid var(--border-color);
+    background-color: #32303d;
+    border-radius: 10px;
+    gap: 4px;
+}
+
+
+.sub-head-form-container{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sub-head-form-container .input-container{
+    display: flex;
+    gap: 5px;
+}
+
+.sub-head-form-container .input-container input{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #32303d;
+    color: var(--dark-color);
+    padding: 0.2rem;
+}
+
+.sub-head-form-container .btn-container{
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.sub-head-form-container .btn-container button{
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: 0.2s ease-in-out;
+}
+
+.sub-head-form-container .btn-container button:hover{
+    background-color: var(--hover-color);
+}
+
+.debit-voucher-form-container > button {
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 5px;
+    transition: 0.2s ease-in-out;
+    width: fit-content;
+}
+
+.debit-voucher-form-container > button:hover {
+    background-color: var(--hover-color);
+}

@@ -2,10 +2,15 @@
     width: 100%;
     padding: 1rem 3rem;
     background-color: var(--primary-color);
+    min-height: 100vh;
+    height: auto;
+    box-sizing: border-box;
 }
 
 .create-section{
-    margin: 1rem 0;
+    margin-top: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 2rem;
 }
 
 .create-section .btns-container{
@@ -24,12 +29,12 @@
 
 .create-section .btns-container button:hover{
     background-color: var(--secondary-color);
-    color: var(--primary-color);
+    color: var(--dark-color);
 }
 
-.active-creaete-new-btn{
+.active-create-new-btn{
     background-color: var(--secondary-color);
-    color: var(--primary-color);
+    color: var(--dark-color);
 }
 
 @media (max-width: 900px) {

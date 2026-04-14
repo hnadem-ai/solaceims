@@ -1,27 +1,33 @@
 :root{
-  --primary-color: #fdf9ed;
-  --secondary-color: #b9590a;
-  --hover-color: #7c4f27;
+  --primary-color: #252330;
+  --secondary-color: rgb(22, 124, 184);
+  --hover-color: rgb(33, 151, 219);
   --light-color: #a58366;
-  --dark-color: #533821;
-  --border-color: #b4b4b4;
+  --dark-color: #eeeeee;
+  --border-color: #4d4d4d;
 }
 
 @font-face {
   font-family: 'ns-reg';
-  src: url('../fonts/NotoSans/NotoSans-Regular.ttf');
+  src: url('../fonts/Libre-Franklin/LibreFranklin-Regular.ttf');
 }
 
 
 @font-face {
   font-family: 'ns-med';
-  src: url('../fonts/NotoSans/NotoSans-Medium.ttf');
+  src: url('../fonts/Libre-Franklin/LibreFranklin-Medium.ttf');
 }
 
 
 @font-face {
   font-family: 'ns-bold';
-  src: url('../fonts/NotoSans/NotoSans-Bold.ttf');
+  src: url('../fonts/Libre-Franklin/LibreFranklin-Bold.ttf');
+}
+
+
+@font-face {
+  font-family: 'ns-black';
+  src: url('../fonts/Libre-Franklin/LibreFranklin-Black.ttf');
 }
 
 @font-face {
@@ -110,16 +116,20 @@ body{
   background-color: var(--hover-color);
 }
 
+.text-xsm{
+  font-size: 0.9rem;
+}
+
 .text-sm{
   font-size: 1.1rem;
 }
 
 .text-med{
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 
 .text-lg{
-  font-size: 2.2rem;
+  font-size: 2rem;
 }
 
 .text-thin{
@@ -128,6 +138,11 @@ body{
 
 .text-bold{
   font-family: 'ns-bold';
+}
+
+
+.text-black{
+  font-family: 'ns-black';
 }
 
 @media (max-width: 900px) {

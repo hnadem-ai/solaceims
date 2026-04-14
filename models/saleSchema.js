@@ -7,14 +7,18 @@ const saleSchema = new mongoose.Schema(
       ref: "Project",
       required: true,
     },
+    projectName: {
+      type: String,
+      trim: true,
+      required: true,
+    },
     fileNo: {
       type: String,
       required: true,
       trim: true,
     },
     inventory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Inventory",
+      type: Number,
       required: true,
     },
     size: {
@@ -38,7 +42,7 @@ const saleSchema = new mongoose.Schema(
       trim: true,
     },
     postalAddress: {
-      type: Number,
+      type: String,
     },
     residentialAddress: {
       type: String,
@@ -46,12 +50,12 @@ const saleSchema = new mongoose.Schema(
       trim: true,
     },
     phoneNo: {
-      type: Number,
+      type: String,
+      trim: true,
       required: true,
     },
     email: {
       type: String,
-      required: true,
       trim: true,
     },
     nationality: {
@@ -60,7 +64,8 @@ const saleSchema = new mongoose.Schema(
       trim: true,
     },
     cnic: {
-      type: Number,
+      type: String,
+      trim: true,
       required: true,
     },
     nomineeName: {
@@ -69,7 +74,8 @@ const saleSchema = new mongoose.Schema(
       trim: true,
     },
     nomineeCnic: {
-      type: Number,
+      type: String,
+      trim: true,
       required: true,
     },
     nomineeRelationship: {
@@ -97,7 +103,7 @@ const saleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    inventory: [
+    installments: [
       {
         date: Date,
         amount: {

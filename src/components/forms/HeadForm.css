@@ -1,4 +1,4 @@
-.bank-form-container{
+.head-form-container{
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -6,14 +6,14 @@
     gap: 1rem;
 }
 
-.bank-form-container .inputs-container{
+.head-form-container .inputs-container{
     width: 100%;
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.bank-form-container .inputs-container input{
+.head-form-container .inputs-container input{
     flex: 1 1;
     height: 35px;
     font-size: 1rem;
@@ -24,7 +24,7 @@
     padding: 0.2rem;
 }
 
-.bank-form-container > button{
+.head-form-container > button{
     background-color: var(--secondary-color);
     padding: 4px 6px;
     border-radius: 5px;
@@ -33,6 +33,6 @@
 }
 
 
-.bank-form-container > button:hover {
+.head-form-container > button:hover {
     background-color: var(--hover-color);
 }

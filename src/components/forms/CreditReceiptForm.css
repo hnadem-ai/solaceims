@@ -1,0 +1,65 @@
+.credit-receipt-form-container{
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.credit-receipt-form-container .inputs-container{
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.credit-receipt-form-container .inputs-container input{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #32303d;
+    color: var(--dark-color);
+    padding: 0.2rem;
+}
+
+.credit-receipt-form-container .inputs-container textarea{
+    flex: 1 1;
+    height: 35px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #32303d;
+    color: var(--dark-color);
+    padding: 0.2rem;
+    overflow: hidden;
+    min-width: 100px;
+    scrollbar-width: 0;
+    resize: none;
+    white-space: nowrap;
+}
+
+.credit-receipt-form-container .inputs-container label{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 4px;
+}
+
+.credit-receipt-form-container .input-wrapper{
+    position: relative;
+    flex: 1 1;
+    display: flex;
+}
+
+.credit-receipt-form-container > button {
+    background-color: var(--secondary-color);
+    padding: 4px 6px;
+    border-radius: 5px;
+    transition: 0.2s ease-in-out;
+    width: fit-content;
+}
+
+.credit-receipt-form-container > button:hover {
+    background-color: var(--hover-color);
+}

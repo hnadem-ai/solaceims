@@ -1,12 +1,13 @@
 import './ProjectForm.css';
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { callAPI } from '../../api/client';
 import InventoryForm from './InventoryForm';
 import CustomDropdown from '../CustomDropdown';
 import plus from '../../assets/plus-primary.png';
 import del from '../../assets/delete.png';
 
-export default function ProjectForm(){
+export default function ProjectForm({ mode = 'create', data = null, onSuccess = () => {} }) {
     const [name, setName] = useState('');
     const [detail, setDetail] = useState('');
     const [bank, setBank] = useState(null);
@@ -18,6 +19,8 @@ export default function ProjectForm(){
     const [showNewInventory, setShowNewInventory] = useState(false);
     const bankRef = useRef();
 
+    const navigate = useNavigate();
+
     function banksToDropdownElements(banks = []) {
         return banks.map((bank) => ({
             value: bank._id,          // ✅ bank id
@@ -26,6 +29,24 @@ export default function ProjectForm(){
         }));
     }
 
+    useEffect(() => {
+        if (mode === 'edit' && data) {
+            console.log('Populating form with data:', data);
+            setName(data.name || '');
+            setDetail(data.detail || '');
+            setBank(data.bank?._id || null);
+            setBankText(data.bank?.name || '');
+            const normalizedInventory = (data.inventory || []).map((item) => ({
+                ...item,
+                id: item._id || Date.now() + Math.random(), // 🔥 stable id
+            }));
+            setInventory(normalizedInventory);
+        }
+    }, [data?._id]);
+
+    useEffect(() => {
+        console.log('Selected bank ID:', bank);
+    }, [name]);
 
     useEffect(() => {
         function handleDocumentClick(e) {
@@ -62,64 +83,63 @@ export default function ProjectForm(){
     }, []);
 
     useEffect(() => {
-        if(bank) return;
-        // If user is editing bank text, the previously selected bank is no longer reliable
-        setBank(null);
-
         const q = bankText.trim();
 
-        // Optional: if empty, either hide dropdown or fetch default list
-        if (!q) {
-            // If you want to show all banks when empty:
-            // setShowDrop(false); // or keep it true
-            // setBanks(initialBanks); // if you store them separately
-            return;
-        }
+        if (!q) return;
 
         const timeoutId = setTimeout(async () => {
             try {
-                // IMPORTANT: assumes your backend supports /api/bank?q=
                 const res = await callAPI(`/api/bank?q=${encodeURIComponent(q)}`, {
                     method: "GET",
                 });
 
-                // Update dropdown list
                 setBanks(res.banks || []);
                 setShowDrop(true);
             } catch (err) {
                 console.error(err);
             }
-        }, 350); // debounce delay (ms) - adjust to taste
+        }, 350);
 
         return () => clearTimeout(timeoutId);
     }, [bankText]);
 
-
     async function onSubmit(e) {
+        e.preventDefault();
 
-        if(!name || !bank){
-            return;
-        }
+        if (!name || !bank) return;
 
-        //Make API body here
+        // 🔥 remove frontend-only id before sending
+        const cleanedInventory = inventory.map(({ id, ...rest }) => rest);
 
         const body = {
             name,
             detail,
             bank,
-            inventoryCounter: inventory.length,
-            inventory,
+            inventory: cleanedInventory,
         };
 
-        //Call API
         try {
-            const res = await callAPI('/api/project', {
-                method: 'POST',
-                body,
-                onError: ({status, message, data} = {}) => {
-                    return;
-                },
-            })
+            let res;
+
+            if (mode === 'edit') {
+                // 🔥 UPDATE
+                const projectId = data._id;
+
+                res = await callAPI(`/api/project/${projectId}`, {
+                    method: 'PUT',
+                    body,
+                });
+
+            } else {
+                // 🔥 CREATE
+                res = await callAPI('/api/project', {
+                    method: 'POST',
+                    body,
+                });
+            }
+            onSuccess(res.project);
+            console.log(res);
+
         } catch (err) {
             console.error(err);
         }
@@ -162,6 +182,7 @@ export default function ProjectForm(){
                                     <p className='text-dark'>Floor: <span className='text-secondary text-bold'>{val.floor}</span></p>
                                     <p className='text-dark'>Size: <span className='text-secondary text-bold'>{val.size}</span></p>
                                     <p className='text-dark'>Utilities: <span className='text-secondary text-bold'>{val.utilities}</span></p>
+                                    <p className='text-dark'>Estimated Val: <span className='text-secondary text-bold'>{val.estimatedValue}</span></p>
                                     <p className='text-dark'>Remarks: <span className='text-secondary text-bold'>{val.remarks ? val.remarks : 'None'}</span></p>
                                     <button onClick={(e) => deleteInventoryItem(e, val.id)}><img src={del} alt="delete"/></button>
                                 </div>

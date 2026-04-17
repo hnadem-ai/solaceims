@@ -14,6 +14,8 @@ export default function Search() {
     const [creditReceipts, setCreditReceipts] = useState([]);
     const [debitVouchers, setDebitVouchers] = useState([]);
 
+    const [searched, setSearched] = useState(false);
+
     const [projectLastId, setProjectLastId] = useState(null);
     const [bankLastId, setBankLastId] = useState(null);
     const [billLastId, setBillLastId] = useState(null);
@@ -24,6 +26,15 @@ export default function Search() {
 
     useEffect(() => {
         setSearch('');
+        setSearched(false);
+
+        setProjects([]);
+        setBanks([]);
+        setBills([]);
+        setVendors([]);
+        setSales([]);
+        setCreditReceipts([]);
+        setDebitVouchers([]);
     }, [searchType]);
 
     async function fetchProjects(customSearch = '') {
@@ -40,6 +51,7 @@ export default function Search() {
 
             setProjects(res.projects || []);
             setProjectLastId(res.nextLastId || null);
+            setSearched(true);
             console.log(res.projects);
         } catch (err) {
             console.error(err);
@@ -60,6 +72,7 @@ export default function Search() {
 
             setBanks(res.banks || []);
             setBankLastId(res.nextLastId || null);
+            setSearched(true);
         } catch (err) {
             console.error(err);
         }
@@ -78,6 +91,7 @@ export default function Search() {
             });
 
             setBills(res.bills || []);
+            setSearched(true);
             setBillLastId(res.nextLastId || null);
         } catch (err) {
             console.error(err);
@@ -97,6 +111,7 @@ export default function Search() {
             });
 
             setVendors(res.vendors || []);
+            setSearched(true);
             setVendorLastId(res.nextLastId || null);
             console.log(res.vendors);
         } catch (err) {
@@ -117,6 +132,7 @@ export default function Search() {
             });
 
             setSales(res.sales || []);
+            setSearched(true);
             setSaleLastId(res.nextLastId || null);
             console.log(res.sales);
         } catch (err) {
@@ -137,26 +153,29 @@ export default function Search() {
             });
 
             setCreditReceipts(res.creditReceipts || []);
+            setSearched(true);
             setCreditReceiptLastId(res.nextLastId || null);
         } catch (err) {
             console.error(err);
         }
     }
 
-    async function fetchDebitVouchers(customSearch = '') {
+    async function fetchDebitVouchers(customSearch = '', lastId = null) {
         try {
             const q = customSearch.trim();
-            const query = q ? `?q=${encodeURIComponent(q)}` : '';
+            const query = `?q=${encodeURIComponent(q)}${lastId ? `&lastId=${lastId}` : ''}`;
 
-            const res = await callAPI(`/api/debit-voucher${query}`, {
-                method: 'GET',
-                onError: ({ message } = {}) => {
-                    console.error(message);
-                },
-            });
+            const res = await callAPI(`/api/debit-voucher${query}`, { method: 'GET' });
 
-            setDebitVouchers(res.debitVouchers || []);
+            if (lastId) {
+                setDebitVouchers(prev => [...prev, ...(res.debitVouchers || [])]);
+            } else {
+                setDebitVouchers(res.debitVouchers || []);
+            }
+            setSearched(true);
+
             setDebitVoucherLastId(res.nextLastId || null);
+
         } catch (err) {
             console.error(err);
         }
@@ -205,14 +224,21 @@ export default function Search() {
             </div>
             <div className='results-section'>
                 {
-                    searchType === 'Project' && projects.length > 0 && (
+                    searchType === 'Project' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Projects</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Projects</h2>}
                             <ul>
+                                {
+                                    projects.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No projects found</p>
+                                    )
+                                }
                                 {projects.map((project) => (
                                     <li className='text-dark text-sm text-reg' key={project._id}>
-                                        <p>{project.name}</p>
-                                        <p>{project.inventory.length} Inventories</p>
+                                        <a href={`/project/${project._id}`}>
+                                            <p>{project.name}</p>
+                                            <p>{project.inventory.length} Inventories</p>
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
@@ -220,10 +246,15 @@ export default function Search() {
                     )
                 }
                 {
-                    searchType === 'Bank' && banks.length > 0 && (
+                    searchType === 'Bank' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Banks</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Banks</h2>}
                             <ul>
+                                {
+                                    banks.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No banks found</p>
+                                    )
+                                }
                                 {banks.map((bank) => (
                                     <li className='text-dark text-sm text-reg' key={bank._id}>
                                         <p>{bank.name}</p>
@@ -235,14 +266,21 @@ export default function Search() {
                     )
                 }
                 {
-                    searchType === 'Bill' && bills.length > 0 && (
+                    searchType === 'Bill' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Bills</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Bills</h2>}
                             <ul>
+                                {
+                                    bills.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No bills found</p>
+                                    )
+                                }
                                 {bills.map((bill) => (
                                     <li className='text-dark text-sm text-reg' key={bill._id}>
-                                        <p>{bill.serialNo} - {bill.vendor.name} - {bill.items.length} item{bill.items.length !== 1 ? 's' : ''}</p>
-                                        <p>{bill.totalAmount}</p>
+                                        <a href={`/bill/${bill._id}`}>
+                                            <p>{bill.serialNo} - {bill.vendor.name} - {bill.items.length} item{bill.items.length !== 1 ? 's' : ''}</p>
+                                            <p>{bill.totalAmount}</p>
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
@@ -250,10 +288,15 @@ export default function Search() {
                     )
                 }
                 {
-                    searchType === 'Vendor' && vendors.length > 0 && (
+                    searchType === 'Vendor' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Vendors</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Vendors</h2>}
                             <ul>
+                                {
+                                    vendors.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No vendors found</p>
+                                    )
+                                }
                                 {vendors.map((vendor) => (
                                     <li className='text-dark text-sm text-reg' key={vendor._id}>
                                         <p>{vendor.name}</p>
@@ -265,14 +308,21 @@ export default function Search() {
                     )
                 }
                 {
-                    searchType === 'Sale' && sales.length > 0 && (
+                    searchType === 'Sale' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Sales</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Sales</h2>}
                             <ul>
+                                {
+                                    sales.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No sales found</p>
+                                    )
+                                }
                                 {sales.map((sale) => (
                                     <li className='text-dark text-sm text-reg' key={sale._id}>
-                                        <p>{sale.projectName} - {sale.inventory}</p>
-                                        <p>{sale.TotalPrice}</p>
+                                        <a href={`/sale/${sale._id}`}>
+                                            <p>{sale.projectName} - {sale.inventory}</p>
+                                            <p>{sale.TotalPrice}</p>
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
@@ -280,15 +330,19 @@ export default function Search() {
                     )
                 }
                 {
-                    searchType === 'Credit Receipt' && creditReceipts.length > 0 && (
+                    searchType === 'Credit Receipt' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Credit Receipts</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Credit Receipts</h2>}
                             <ul>
+                                {
+                                    creditReceipts.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No credit receipts found</p>
+                                    )
+                                }
                                 {creditReceipts.map((receipt) => (
                                     <li className='text-dark text-sm text-reg' key={receipt._id}>
                                         <p>{receipt.serialNo}</p>
                                         <p>{receipt.amount}</p>
-
                                     </li>
                                 ))}
                             </ul>   
@@ -296,22 +350,29 @@ export default function Search() {
                     )
                 }
                 {
-                    searchType === 'Debit Voucher' && debitVouchers.length > 0 && (
+                    searchType === 'Debit Voucher' && (
                         <div className='results'>
-                            <h2 className='text-lg text-bold text-dark'>Debit Vouchers</h2>
+                            {searched && <h2 className='text-lg text-bold text-dark'>Debit Vouchers</h2>}
                             <ul>
+                                {
+                                    debitVouchers.length === 0 && searched && (
+                                        <p className='text-dark text-sm text-reg'>No debit vouchers found</p>
+                                    )
+                                }
                                 {debitVouchers.map((voucher) => (
                                     <li className='text-dark text-sm text-reg' key={voucher._id}>
                                         <p>{voucher.serialNo}</p>
                                         <p>{voucher.amount}</p>
                                     </li>
                                 ))}
-                            </ul>   
+                            </ul>
+                            <div className='pagination'>
+                                {debitVoucherLastId && <button className='text-sm text-dark' onClick={() => fetchDebitVouchers(search, debitVoucherLastId)}>Load More</button>}
+                            </div>   
                         </div>
                     )
                 }
             </div>
-            
         </div>
     );
 }

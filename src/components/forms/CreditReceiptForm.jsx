@@ -212,7 +212,7 @@ export default function CreditReceiptForm() {
 
         async function fetchSales() {
             try {
-                const res = await callAPI(`/api/sale/${project}`, {
+                const res = await callAPI(`/api/project-sales/${project}`, {
                     method: 'GET',
                 })
                 console.log(res.sales);

@@ -55,14 +55,18 @@ const debitVoucherSchema = new mongoose.Schema(
     },
     heads: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Head",
-      },
-    ],
-    subHeads: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SubHead",
+        name: {
+          type: String,
+          required: true,
+        },
+        subHeads: [
+          { 
+            name: {
+              type: String,
+              required: true,
+            },
+          },
+        ],
       },
     ],
   },

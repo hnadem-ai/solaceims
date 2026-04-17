@@ -80,7 +80,7 @@
 .inventory-container .added-inventory-container{
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .inventory-container .added-inventory-container .added-inventory{

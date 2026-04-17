@@ -5,7 +5,7 @@ import CustomDropdown from '../CustomDropdown';
 import plus from '../../assets/plus-primary.png';
 import del from '../../assets/delete.png';
 
-export default function DebitVoucherForm(){
+export default function DebitVoucherForm() {
     const [project, setProject] = useState(null);
     const [showProjectDrop, setShowProjectDrop] = useState(false)
     const [projectText, setProjectText] = useState('');
@@ -21,7 +21,7 @@ export default function DebitVoucherForm(){
     const [headText, setHeadText] = useState('');
     const [showHeads, setShowHeads] = useState([]);
 
-    const [subHead, setSubHead] = useState(null);
+    const [subHeads, setSubHeads] = useState([]);
     const [showSubHeadDrop, setShowSubHeadDrop] = useState(false)
     const [subHeadText, setSubHeadText] = useState('');
     const [showSubHeads, setShowSubHeads] = useState([]);
@@ -76,7 +76,7 @@ export default function DebitVoucherForm(){
     const billReqId = useRef(0);
     const bankReqId = useRef(0);
     const paidToReqId = useRef(0);
-    
+
     useEffect(() => {
         function handleDocumentClick(e) {
             if (!showProjectDrop) return;
@@ -273,7 +273,7 @@ export default function DebitVoucherForm(){
     }, [head]);
 
     useEffect(() => {
-        if(!paidToConfig) return
+        if (!paidToConfig) return
         async function fetchProjects() {
             try {
                 const res = await callAPI('/api/project', {
@@ -302,7 +302,7 @@ export default function DebitVoucherForm(){
     }, [paidToConfig]);
 
     useEffect(() => {
-        if(project) return;
+        if (project) return;
         setProject(null);
 
         const q = projectText.trim();
@@ -335,7 +335,7 @@ export default function DebitVoucherForm(){
     }, [projectText]);
 
     useEffect(() => {
-        if(bank) return;
+        if (bank) return;
 
         setBank(null);
 
@@ -369,7 +369,7 @@ export default function DebitVoucherForm(){
     }, [bankText]);
 
     useEffect(() => {
-        if(bill) return;
+        if (bill) return;
         setBill(null);
 
         const q = billText.trim();
@@ -402,7 +402,11 @@ export default function DebitVoucherForm(){
     }, [billText]);
 
     useEffect(() => {
-        if(paidTo) return;
+        console.log(subHeads)
+    }, [subHeads]);
+
+    useEffect(() => {
+        if (paidTo) return;
         // typing invalidates previous selection
         setPaidTo(null);
 
@@ -461,41 +465,40 @@ export default function DebitVoucherForm(){
 
         let hasError = false;
 
-        if (!project) { setErrBorder("project", true); hasError = true; }
-        else setErrBorder("project", false);
-
-        if (!date) { setErrBorder("date", true); hasError = true; }
-        else setErrBorder("date", false);
-
-        if (!paidTo) { setErrBorder("paidTo", true); hasError = true; }
-        else setErrBorder("paidTo", false);
-
-        if (amount == null || amount === "" || Number(amount) <= 0) {
-            setErrBorder("amount", true);
+        if (!project) {
+            console.log("❌ project missing");
+            setErrBorder("project", true);
             hasError = true;
-        } else setErrBorder("amount", false);
+        }
 
-        if (!payInstrument) {
-            setErrBorder("payInstrument", true);
+        if (!date) {
+            console.log("❌ date missing");
             hasError = true;
-        } else setErrBorder("payInstrument", false);
-
-        if (!payStatus) {
-            setErrBorder("payStatus", true);
-            hasError = true;
-        } else setErrBorder("payStatus", false);
+        }
 
         if (!paidTo) {
-            setErrBorder("paidTo", true);
+            console.log("❌ paidTo missing");
             hasError = true;
-        } else setErrBorder("paidTo", false);
+        }
+
+        if (!payInstrument) {
+            console.log("❌ payInstrument missing");
+            hasError = true;
+        }
+
+        if (!payStatus) {
+            console.log("❌ payStatus missing");
+            hasError = true;
+        }
 
         if (paidToConfig !== 'Project' && paidToConfig !== 'Vendor') {
-            setErrBorder("paidTo", true);
+            console.log("❌ paidToConfig invalid:", paidToConfig);
             hasError = true;
-        } else setErrBorder("paidTo", false);
-
-        if (hasError) return;
+        }
+        if (hasError) {
+            console.log("🚫 VALIDATION FAILED");
+            return;
+        }
 
         // --------- conditional validations ----------
         const isCheque =
@@ -531,18 +534,12 @@ export default function DebitVoucherForm(){
         // --------- build body (matches schema) ----------
         const body = {
             project,
-            // serialNo is required in schema, but your backend currently does NOT set it.
-            // If you plan to set it server-side, remove it from required in schema OR set it in backend.
-            // For now, if you have a serialNo state, include it:
-            // serialNo,
-
             date: new Date(date), // ensure Date
             paidTo: paidTo,
             targetModel: paidToConfig, // critical for refPath
             amount: Number(amount),
             payInstrument,
             payStatus,
-
             // optional:
             instrumentNo: instrumentNo?.trim() || undefined,
             instrumentDate: instrumentDate ? new Date(instrumentDate) : undefined,
@@ -550,8 +547,7 @@ export default function DebitVoucherForm(){
             bank: bank,
 
             // arrays (optional)
-            heads: Array.isArray(addedHeads) ? addedHeads.map(h => h._id) : undefined,
-            subHeads: Array.isArray(addedSubHeads) ? addedSubHeads.map(s => s._id) : undefined,
+            heads: Array.isArray(addedHeads) ? addedHeads : undefined,
         };
 
         // Remove undefined keys (keeps payload clean)
@@ -582,15 +578,25 @@ export default function DebitVoucherForm(){
         setPaidToConfig(event.target.value);
     };
 
-    
-    function deleteHead(e, id){
+    const addSubHead = (e, subHead) => {
         e.preventDefault();
-        setAddedHeads(prev => prev.filter(head => head._id !== id))
-    }
 
-    function deleteSubHead(e, id){
+        setSubHeads(prev => {
+            const exists = prev.find(sh => sh.name === subHead.name);
+
+            if (exists) {
+                // ❌ remove
+                return prev.filter(sh => sh.name !== subHead.name);
+            } else {
+                // ✅ add
+                return [...prev, { name: subHead.name }];
+            }
+        });
+    };
+
+    function deleteHead(e, name) {
         e.preventDefault();
-        setAddedSubHeads(prev => prev.filter(subHead => subHead._id !== id))
+        setAddedHeads(prev => prev.filter(head => head.name !== name))
     }
 
     function onHeadAdd(e) {
@@ -600,32 +606,19 @@ export default function DebitVoucherForm(){
             document.getElementById('head').style.borderColor = 'red';
             return;
         }
-        const payload = {
-            _id: head,
-            name: headText,
-        };
-        setAddedHeads(prev => [...prev, payload]);
+        const headName = showHeads.find(h => h._id === head)?.name || headText;
+        const newHead = {
+            name: headName,
+            subHeads: subHeads,
+        }
+        setAddedHeads(prev => [...prev, newHead]);
         setHead(null);
+        setSubHeads([]);
         setHeadText('');
         setShowNewHead(false);
     }
 
-     function onSubHeadAdd(e) {
-        e.preventDefault();
-
-        if (!subHead) {
-            document.getElementById('subHead').style.borderColor = 'red';
-            return;
-        }
-        const payload = {
-            _id: subHead,
-            name: subHeadText,
-        };
-        setAddedSubHeads(prev => [...prev, payload]);
-        setSubHead(null);
-        setSubHeadText('');
-        setShowNewSubHead(false);
-    }
+    console.log(addedHeads, 'subheads')
 
     return (
         <form onSubmit={onSubmit} className='debit-voucher-form-container'>
@@ -663,7 +656,7 @@ export default function DebitVoucherForm(){
             <div className='inputs-container'>
                 <div className='input-wrapper'>
                     <input id='payInstrument' autoComplete='off' ref={payInstrumentRef} placeholder='Pay Instrument' type="text" value={payInstrument} onChange={(e) => setPayInstrument(e.target.value)} onClick={(e) => setShowPayInstrumentDrop(true)} />
-                    {showPayInstrumentDrop && <CustomDropdown setSelfState={setShowPayInstrumentDrop} setState={setPayInstrument} setText={() => {return null}} elements={arrayToDropdownElements([{name: 'Cash', _id: 'Cash'}, {name: 'Post Dated Cheque', _id: 'Post Dated Cheque'}, {name: 'Online Transfer', _id: 'Online Transfer'},{name: 'Cheque', _id: 'Cheque'},])} />}
+                    {showPayInstrumentDrop && <CustomDropdown setSelfState={setShowPayInstrumentDrop} setState={setPayInstrument} setText={() => { return null }} elements={arrayToDropdownElements([{ name: 'Cash', _id: 'Cash' }, { name: 'Post Dated Cheque', _id: 'Post Dated Cheque' }, { name: 'Online Transfer', _id: 'Online Transfer' }, { name: 'Cheque', _id: 'Cheque' },])} />}
                 </div>
                 <input id='instrumentNo' autoComplete='off' type='text' onChange={(e) => setInstrumentNo(e.target.value)} value={instrumentNo} placeholder='Instrument No.' disabled={payInstrument === 'Cash' || payInstrument === ''} />
                 <h1 className='text-sm text-bold text-dark'>Instrument Date:</h1>
@@ -682,8 +675,9 @@ export default function DebitVoucherForm(){
             <div className='inputs-container'>
                 <div className='input-wrapper'>
                     <input id='payStatus' autoComplete='off' ref={payStatusRef} placeholder='Pay Status' type="text" value={payStatus} onChange={(e) => setPayStatus(e.target.value)} onClick={(e) => setShowPayStatusDrop(true)} />
-                    {showPayStatusDrop && <CustomDropdown setSelfState={setShowPayStatusDrop} setState={setPayStatus} setText={() => {return null}} elements={arrayToDropdownElements([{name: 'Paid', _id: 'Paid'}, {name: 'Unpaid', _id: 'Unpaid'}, {name: 'Due', _id: 'Due'},])} />}
+                    {showPayStatusDrop && <CustomDropdown setSelfState={setShowPayStatusDrop} setState={setPayStatus} setText={() => { return null }} elements={arrayToDropdownElements([{ name: 'Paid', _id: 'Paid' }, { name: 'Unpaid', _id: 'Unpaid' }, { name: 'Due', _id: 'Due' },])} />}
                 </div>
+                <input style={{maxWidth: '658px'}} id='amount' autoComplete='off' type='number' onChange={(e) => setAmount(e.target.value)} value={amount === 0 ? '' : amount}placeholder='Amount' />
             </div>
             <div className='heads-sub-heads-container'>
                 <div className='heads-container'>
@@ -698,8 +692,21 @@ export default function DebitVoucherForm(){
                             ) : addedHeads.map((val, index) => {
                                 return (
                                     <div className='added-head' key={index}>
-                                        <p>Name: <span className='text-sm text-secondary text-bold'>{val.name}</span></p>
-                                        <button onClick={(e) => deleteHead(e, val._id)}><img src={del} alt="delete" /></button>
+                                        <div className='added-head-name'>
+                                            <p>Name: <span className='text-sm text-secondary text-bold'>{val.name}</span></p>
+                                            <button onClick={(e) => deleteHead(e, val.name)}><img src={del} alt="delete" /></button>
+                                        </div>
+                                        <div className='added-sub-heads'>
+                                            {
+                                                val.subHeads.length === 0 ? (
+                                                    <p className='text-dark text-xsm text-thin'>No sub-heads added</p>
+                                                ) : val.subHeads.map((subVal, subIndex) => (
+                                                    <div className='added-sub-head' key={subIndex}>
+                                                        <p className='text-sm text-dark'>{subVal.name}</p>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
                                     </div>
                                 )
                             })
@@ -714,44 +721,23 @@ export default function DebitVoucherForm(){
                                     {showHeads.length > 0 && showHeadDrop && <CustomDropdown setSelfState={setShowHeadDrop} setState={setHead} setText={setHeadText} elements={arrayToDropdownElements(showHeads)} />}
                                 </div>
                             </div>
+                            {
+                                head && (
+                                    <div className='sub-head-selector'>
+                                        <h2 className='text-sm text-dark'>Select Sub-Head:</h2>
+                                        {showHeads.find(h => h._id === head)?.subHeads?.length > 0 &&
+                                            showHeads.find(h => h._id === head)?.subHeads.map(subHead => (
+                                                <div className={'sub-head-input' + ' ' + (subHeads.find(sh => sh.name === subHead.name) ? 'added' : '')}>
+                                                    <button className={'text-sm text-dark text-reg'} onClick={(e) => addSubHead(e, subHead)}>{subHead.name}</button>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                )
+                            }
                             <div className='btn-container'>
                                 <button className='text-xsm text-dark' onClick={onHeadAdd}>Add</button>
                                 <button className='text-xsm text-dark' onClick={(e) => { e.preventDefault(); setShowNewHead(false) }}>Cancel</button>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div className='sub-heads-container'>
-                    <div className='sub-heads-header'>
-                        <h1 className='text-med text-bold text-dark'>Sub Heads<span className='text-secondary'>:</span></h1>
-                        <button className='text-sm text-primary' onClick={(e) => { e.preventDefault(); setShowNewSubHead(true) }}><img src={plus} alt='plus' /></button>
-                    </div>
-                    <div className='added-sub-heads-container'>
-                        {
-                            addedHeads.length === 0 ? (
-                                <p className='text-dark text-xsm text-thin'>{addedSubHeads.length} Sub Heads added</p>
-                            ) : addedSubHeads.map((val, index) => {
-                                return (
-                                    <div className='added-sub-head' key={index}>
-                                        <p>Name: <span className='text-sm text-secondary text-bold'>{val.name}</span></p>
-                                        <button onClick={(e) => deleteSubHead(e, val._id)}><img src={del} alt="delete" /></button>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                    {showNewSubHead &&
-                        <div className='sub-head-form-container'>
-                            <h2 className='text-sm text-dark'>New Sub Head:</h2>
-                            <div className='input-container'>
-                                <div className='input-wrapper'>
-                                    <input id='subHead' ref={subHeadRef} placeholder='Sub Head' type="text" value={subHeadText} onChange={(e) => setSubHeadText(e.target.value)} onClick={(e) => setShowSubHeadDrop(true)} />
-                                    {showSubHeads.length > 0 && head && showSubHeadDrop && <CustomDropdown setSelfState={setShowSubHeadDrop} setState={setSubHead} setText={setSubHeadText} elements={arrayToDropdownElements(showSubHeads)} />}
-                                </div>
-                            </div>
-                            <div className='btn-container'>
-                                <button className='text-xsm text-dark' onClick={onSubHeadAdd}>Add</button>
-                                <button className='text-xsm text-dark' onClick={(e) => { e.preventDefault(); setShowNewSubHead(false) }}>Cancel</button>
                             </div>
                         </div>
                     }

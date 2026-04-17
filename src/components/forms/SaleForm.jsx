@@ -5,7 +5,7 @@ import CustomDropdown from '../CustomDropdown';
 import plus from '../../assets/plus-primary.png';
 import del from '../../assets/delete.png';
 
-export default function SaleForm(){
+export default function SaleForm({mode = 'create', data = null , onSuccess = () => {}}) {
 
     const [fileNo, setFileNo] = useState('');
     const [inventoryNo, setInventoryNo] = useState('');
@@ -56,6 +56,47 @@ export default function SaleForm(){
     const projectReqId = useRef(0);
 
     useEffect(() => {
+        if (mode !== 'edit' || !data) return;
+
+        setProject(data.project);
+        setProjectText(data.projectName || '');
+
+        setFileNo(data.fileNo || '');
+        setInventoryNo(data.inventory || '');
+        setSize(data.size || '');
+        setSaleType(data.saleType || '');
+
+        setName(data.name || '');
+        setFatherOrHusbandName(data.fatherOrHusbandName || '');
+        setPostalAddress(data.postalAddress || '');
+        setResidentialAddress(data.residentialAddress || '');
+        setPhoneNo(data.phoneNo || '');
+        setEmail(data.email || '');
+        setNationality(data.nationality || '');
+        setCnic(data.cnic || '');
+
+        setNomineeName(data.nomineeName || '');
+        setNomineeCnic(data.nomineeCnic || '');
+        setNomineeRelationShip(data.nomineeRelationship || '');
+        setNomineeAddress(data.nomineeAddress || '');
+
+        setUnitPrice(data.unitCost || 0);
+        setUtilityCharges(Number(data.utilitycharges) || 0);
+
+        setWestOpen(data.westOpen || false);
+        setParkFacing(data.parkFacing || false);
+        setCorner(data.corner || false);
+
+        const normalizedInstallments = (data.installments || []).map(i => ({
+            ...i,
+            id: i._id || Date.now() + Math.random()
+        }));
+
+        setInstallments(normalizedInstallments);
+
+    }, [data?._id]);
+
+    useEffect(() => {
         setTotalPrice(Number(unitPrice) + Number(utilityCharges))
     }, [unitPrice, utilityCharges]);
 
@@ -90,10 +131,6 @@ export default function SaleForm(){
     }, []);
 
     useEffect(() => {
-        if(project) return;
-        // typing invalidates selected project
-        setProject(null);
-
         const q = projectText.trim();
 
         if (!q || q.length < 2) {
@@ -279,18 +316,27 @@ export default function SaleForm(){
         body.installments = body.installments.filter((i) => i.date);
 
         try {
-            const res = await callAPI("/api/sale", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body,
-                onError: ({ status, message, data } = {}) => {
-                    console.error("❌ Create sale failed:", { status, message, data });
-                },
-            });
+            let res;
 
-            console.log("✅ Sale created:", res);
+            if (mode === 'edit') {
+                const saleId = data._id;
 
-            // optional: reset form here if desired
+                res = await callAPI(`/api/sale/${saleId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body,
+                });
+
+            } else {
+                res = await callAPI('/api/sale', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body,
+                });
+            }
+            onSuccess(res.sale);
+            console.log("✅ Success:", res);
+
         } catch (err) {
             console.error(err);
         }
@@ -318,7 +364,7 @@ export default function SaleForm(){
         setInstallmentDate('')
         setDescription('')
     }
-    
+
     function deleteInstallment(e, id) {
         e.preventDefault();
         setInstallments(prev => prev.filter(item => item.id !== id))
@@ -365,9 +411,9 @@ export default function SaleForm(){
                 <h1 className='text-sm text-dark'>West Open:</h1>
                 <input id='westOpen' type='checkbox' checked={westOpen} onChange={(e) => setWestOpen(e.target.checked)} />
                 <h1 className='text-sm text-dark'>Park Facing:</h1>
-                <input id='parkFacing' type='checkbox' checked={parkFacing} onChange={(e) => setParkFacing(e.target.checked)}/>
+                <input id='parkFacing' type='checkbox' checked={parkFacing} onChange={(e) => setParkFacing(e.target.checked)} />
                 <h1 className='text-sm text-dark'>Corner:</h1>
-                <input id='corner' type='checkbox' checked={corner} onChange={(e) => setCorner(e.target.checked)}/>
+                <input id='corner' type='checkbox' checked={corner} onChange={(e) => setCorner(e.target.checked)} />
             </div>
             <div className='installments-container'>
                 <div className='installments-header'>
@@ -381,9 +427,9 @@ export default function SaleForm(){
                         ) : installments.map((val, index) => {
                             return (
                                 <div className='added-installment' key={index}>
-                                    <p>Date: <span className='text-secondary text-bold'>{val.date}</span></p>
-                                    <p>Amount: <span className='text-secondary text-bold'>{val.amount}</span></p>
-                                    <p>Description: <span className='text-secondary text-bold'>{val.description ? val.description : 'None'}</span></p>
+                                    <p className='text-dark'>Date: <span className='text-secondary text-bold'>{val.date}</span></p>
+                                    <p className='text-dark'>Amount: <span className='text-secondary text-bold'>{val.amount}</span></p>
+                                    <p className='text-dark'>Description: <span className='text-secondary text-bold'>{val.description ? val.description : 'None'}</span></p>
                                     <button onClick={(e) => deleteInstallment(e, val.id)}><img src={del} alt="delete" /></button>
                                 </div>
                             )
@@ -391,7 +437,7 @@ export default function SaleForm(){
                     }
                 </div>
                 {showNewInstallment ?
-                   (
+                    (
                         <div className='installment-form-container'>
                             <h2 className='text-sm text-dark'>New Installment</h2>
                             <div className='input-container'>
@@ -408,7 +454,7 @@ export default function SaleForm(){
                     <></>
                 }
             </div>
-            <textarea name="detail" value={comments} onChange={(e) => setComments(e.target.value)} placeholder='Comments (optional)'/>
+            <textarea name="detail" value={comments} onChange={(e) => setComments(e.target.value)} placeholder='Comments (optional)' />
             <button className='text-sm text-thin text-dark' type='submit'>Submit</button>
         </form>
     )

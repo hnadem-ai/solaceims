@@ -1,37 +1,37 @@
-.project-view-container{
+.sale-view-container{
     width: 100%;
     padding: 1rem 3rem;
     background-color: var(--primary-color);
     height: 1400px;
 }
 
-.project-edit-wrapper{
+.sale-edit-wrapper{
     width: 100%;
     margin-top: 1rem;
 }
 
-.project-view-wrapper{
+.sale-view-wrapper{
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.1rem;
     margin-top: 1rem;
 }
 
-.project-view-wrapper .inventories-container{
+.sale-view-wrapper .installments-container{
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
     margin-left: 1rem;
-}
+}   
 
-.project-view-wrapper .inventories-container .inventory-item{
+.sale-view-wrapper .installments-container .item{
     display: flex;
     padding: 0.2rem 0;
     gap: 0.5rem;
-}
+}   
 
-.project-view-wrapper .inventories-container .inventory-item p{
+.sale-view-wrapper .installments-container .item p{
     display: flex;
     align-items: center;
     gap: 5px;
@@ -41,15 +41,14 @@
     padding: 0.4rem 1rem;
 }
 
-
-.project-view-wrapper button {
+.sale-view-wrapper > button {
     padding: 0.4rem;
     border-radius: 5px;
     transition: 0.2s ease;
     width: fit-content;
 }
 
-.project-view-wrapper button:hover {
+.sale-view-wrapper > button:hover {
     background-color: var(--hover-color);
     color: var(--dark-color);
 }

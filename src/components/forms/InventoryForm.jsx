@@ -6,6 +6,7 @@ export default function InventoryForm({setInventory, setShowNewInventory}){
     const [floor, setFloor] = useState('');
     const [size, setSize] = useState('');
     const [utilities, setUtilities] = useState('');
+    const [estimatedValue, setEstimatedValue] = useState('');
     const [remarks, setRemarks] = useState('');
 
     function onAdd(e){
@@ -32,6 +33,7 @@ export default function InventoryForm({setInventory, setShowNewInventory}){
             size: Number(size),
             floor: Number(floor),
             utilities: Number(utilities),
+            estimatedValue: Number(estimatedValue),
             remarks,
         }
         setInventory(prev => [...prev, payload])
@@ -46,6 +48,7 @@ export default function InventoryForm({setInventory, setShowNewInventory}){
                 <input id='floor' type="number" value={floor} onChange={(e) => setFloor(e.target.value)} placeholder='Floor No.'/>
                 <input id='size' type="number" value={size} onChange={(e) => setSize(e.target.value)} placeholder='Size'/>
                 <input id='utilities' type="number" value={utilities} onChange={(e) => setUtilities(e.target.value)} placeholder='Utilities'/>
+                <input id='estimatedValue' type="number" value={estimatedValue} onChange={(e) => setEstimatedValue(e.target.value)} placeholder='Estimated Value'/>
                 <textarea id='remarks' type="text" value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder='Remarks (optional)'/>
             </div>
             <div className='btn-container'>

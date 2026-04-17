@@ -97,20 +97,19 @@
 .installments-container .added-installments-container{
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 1rem;
 }
 
 .installments-container .added-installments-container .added-installment{
     display: flex;
-    background-color: white;
-    height: 40px;
-    border-radius: 10px;
+    height: auto;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    gap: 5px;
+    flex-wrap: wrap;
 }
 
 .installments-container .added-installments-container .added-installment button img{
-    height: 100%;
+    height: 40px;
     padding: 0.5rem;
     display: grid;
     place-items: center;
@@ -122,8 +121,10 @@
     display: flex;
     align-items: center;
     padding: 0.2rem;
-    border-right: 1px solid var(--border-color);
     gap: 4px;
+    border-radius: 10px;
+    background-color: #32303d;
+    border: 1px solid var(--border-color);
 }
 
 

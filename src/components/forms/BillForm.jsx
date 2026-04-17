@@ -1,11 +1,12 @@
 import './BillForm.css';
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { callAPI } from '../../api/client';
 import CustomDropdown from '../CustomDropdown';
 import plus from '../../assets/plus-primary.png';
 import del from '../../assets/delete.png';
 
-export default function BillForm(){
+export default function BillForm({ mode = 'create', data = {}, onSuccess = () => {} }) {
 
     const [vendor, setVendor] = useState(null);
     const [showVendorDrop, setShowVendorDrop] = useState(false)
@@ -30,8 +31,32 @@ export default function BillForm(){
     const [amount, setAmount] = useState('');
     const [itemComments, setItemComments] = useState('');
 
+    const navigate = useNavigate();
+
     useEffect(() => {
-        setAmount(rate*quantity);
+        if (!data) return;
+        if (mode === 'create') return;
+
+        setVendor(data.vendor?._id);
+        setVendorText(data.vendor?.name || '');
+        setVendorBillNo(data.vendorBillNo || '');
+        setComments(data.comments || '');
+
+        // 🔥 FIX: ensure every item has an id
+        const normalizedItems = (data.items || []).map((item) => ({
+            ...item,
+            id: item._id || Date.now() + Math.random(), // fallback if no _id
+        }));
+
+        setItems(normalizedItems);
+
+        setTotalAmount(data.totalAmount || 0);
+        setHead(data.head?._id);
+        setHeadText(data.head?.name || '');
+    }, [data]);
+
+    useEffect(() => {
+        setAmount(rate * quantity);
     }, [rate, quantity])
 
     const vendorRef = useRef();
@@ -108,18 +133,9 @@ export default function BillForm(){
     }, []);
 
     useEffect(() => {
-        if(vendor) return;
-        // When typing starts again, previously selected vendor is invalid
-        setVendor(null);
-
         const q = vendorText.trim();
 
-        if (!q) {
-            setVendors([]);
-            return;
-        }
-
-        if (q.length < 2) {
+        if (!q || q.length < 2) {
             setVendors([]);
             return;
         }
@@ -132,7 +148,6 @@ export default function BillForm(){
                     method: 'GET',
                 });
 
-                // Ignore stale responses
                 if (reqId !== vendorReqId.current) return;
 
                 setVendors(res.vendors || []);
@@ -141,24 +156,15 @@ export default function BillForm(){
                 if (reqId !== vendorReqId.current) return;
                 console.error(err);
             }
-        }, 350); // ⏱ debounce delay
+        }, 350);
 
         return () => clearTimeout(timeoutId);
     }, [vendorText]);
 
     useEffect(() => {
-        if(head) return;
-        // Typing invalidates previously selected head
-        setHead(null);
-
         const q = headText.trim();
 
-        if (!q) {
-            setHeads([]);
-            return;
-        }
-
-        if (q.length < 2) {
+        if (!q || q.length < 2) {
             setHeads([]);
             return;
         }
@@ -171,7 +177,6 @@ export default function BillForm(){
                     method: 'GET',
                 });
 
-                // Ignore stale responses
                 if (reqId !== headReqId.current) return;
 
                 setHeads(res.heads || []);
@@ -180,18 +185,20 @@ export default function BillForm(){
                 if (reqId !== headReqId.current) return;
                 console.error(err);
             }
-        }, 350); // ⏱ debounce delay
+        }, 350);
 
         return () => clearTimeout(timeoutId);
     }, [headText]);
 
+    useEffect(() => {
+        setTotalAmount(calculateTotalAmount());
+    }, [items]);
 
     async function onSubmit(e) {
-        e.preventDefault()
-        //Make API body here
+        e.preventDefault();
 
         if (!vendor || !head || !vendorBillNo) {
-            console.log(vendor, head, vendorBillNo)
+            console.log(vendor, head, vendorBillNo);
             return;
         }
 
@@ -201,28 +208,55 @@ export default function BillForm(){
             head,
             comments,
             items,
-            totalAmount,   
+            totalAmount,
         };
 
-        //Call API
         try {
-            const res = await callAPI('/api/bill', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body,
-                onError: ({ status, message, data } = {}) => {
-                    return;
-                },
-            })
-            console.log(res.status)
+            let res;
+
+            if (mode === 'edit') {
+                // 🔥 UPDATE
+                const billId = data._id;
+
+                res = await callAPI(`/api/bill/${billId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body,
+                });
+
+            } else {
+                // 🔥 CREATE
+                res = await callAPI('/api/bill', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body,
+                });
+            }
+
+            onSuccess(res.bill);
+            console.log(res.status);
+
+            // 🔥 optional: reset form or exit edit mode
+            if (mode === 'create') {
+                // reset form
+                setVendor(null);
+                setVendorText('');
+                setVendorBillNo('');
+                setComments('');
+                setItems([]);
+                setTotalAmount(0);
+            }
+
         } catch (err) {
             console.error(err);
         }
     }
 
-    function calculateTotalAmount(){
+    function calculateTotalAmount() {
         return items.reduce((sum, curr) => sum + (Number(curr.amount) || 0), 0);
     }
 
@@ -279,14 +313,14 @@ export default function BillForm(){
         <form className='bill-form-container' onSubmit={onSubmit}>
             <div className='inputs-container'>
                 <div className='input-wrapper'>
-                    <input id='vendor' autoComplete='off' ref={vendorRef} placeholder='Vendor' type="text" value={vendorText} onChange={(e) => setVendorText(e.target.value)} onClick={(e) => setShowVendorDrop(vendors.length > 0 ? true : false)}/>
-                    {showVendorDrop && <CustomDropdown setSelfState={setShowVendorDrop} setState={setVendor} setText={setVendorText} elements={arrayToDropdownElements(vendors)}/>}
+                    <input id='vendor' autoComplete='off' ref={vendorRef} placeholder='Vendor' type="text" value={vendorText} onChange={(e) => setVendorText(e.target.value)} onClick={(e) => setShowVendorDrop(vendors.length > 0 ? true : false)} />
+                    {showVendorDrop && <CustomDropdown setSelfState={setShowVendorDrop} setState={setVendor} setText={setVendorText} elements={arrayToDropdownElements(vendors)} />}
                 </div>
-                <input id='vendorBillNo' autoComplete='off' placeholder='Vendor Bill No.' type="text" value={vendorBillNo} onChange={(e) => setVendorBillNo(e.target.value)}/>
+                <input id='vendorBillNo' autoComplete='off' placeholder='Vendor Bill No.' type="text" value={vendorBillNo} onChange={(e) => setVendorBillNo(e.target.value)} />
                 <input id='comments' autoComplete='off' type='text' onChange={(e) => setComments(e.target.value)} value={comments} placeholder='Comments (optional)' />
                 <div className='input-wrapper'>
-                    <input id='head' autoComplete='off' ref={headRef} placeholder='Head' type="text" value={headText} onChange={(e) => setHeadText(e.target.value)} onClick={(e) => setShowHeadDrop(heads.length > 0 ? true : false)}/>
-                    {showHeadDrop && <CustomDropdown setSelfState={setShowHeadDrop} setState={setHead} setText={setHeadText} elements={arrayToDropdownElements(heads)}/>}
+                    <input id='head' autoComplete='off' ref={headRef} placeholder='Head' type="text" value={headText} onChange={(e) => setHeadText(e.target.value)} onClick={(e) => setShowHeadDrop(heads.length > 0 ? true : false)} />
+                    {showHeadDrop && <CustomDropdown setSelfState={setShowHeadDrop} setState={setHead} setText={setHeadText} elements={arrayToDropdownElements(heads)} />}
                 </div>
             </div>
             <div className='items-container'>
@@ -322,7 +356,7 @@ export default function BillForm(){
                                 <input id='unit' autoComplete='off' type="text" value={unit} onChange={(e) => setUnit(e.target.value)} placeholder='Unit' />
                                 <input id='rate' autoComplete='off' type="number" value={rate} onChange={(e) => setRate(e.target.value)} placeholder='Rate' />
                                 <input id='quantity' autoComplete='off' type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder='Quantity' />
-                                <input id='amount' autoComplete='off' type="number" value={quantity*rate === 0 ? 'Amount' : quantity*rate} onChange={(e) => setAmount(e.target.value)} placeholder='Amount' />
+                                <input id='amount' autoComplete='off' type="number" value={quantity * rate === 0 ? 'Amount' : quantity * rate} onChange={(e) => setAmount(e.target.value)} placeholder='Amount' />
                                 <textarea id='comments' autoComplete='off' type="text" value={itemComments} onChange={(e) => setItemComments(e.target.value)} placeholder='Comments (optional)' />
                             </div>
                             <div className='btn-container'>

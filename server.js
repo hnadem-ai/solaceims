@@ -250,7 +250,7 @@ app.get("/api/sale", async (req, res) => {
   }
 });
 
-app.get("/api/sale/:projectId", async (req, res) => {
+app.get("/api/project-sales/:projectId", async (req, res) => {
   try {
     const { q, lastId } = req.query;
     const projectId = req.params.projectId;
@@ -346,7 +346,7 @@ app.get("/api/credit-receipt", async (req, res) => {
 app.get("/api/project/:id", async (req, res) => {
   try {
     const projectId = req.params.id;
-    const project = await Project.findById(projectId);
+    const project = await Project.findById(projectId).populate("bank", "_id accNum name").lean();
     if (!project) return res.status(404).json({ message: 'No Project was found!' });
     return res.status(200).json({ project });
   } catch (err) {
@@ -370,7 +370,8 @@ app.get("/api/bank/:id", async (req, res) => {
 app.get("/api/bill/:id", async (req, res) => {
   try {
     const billId = req.params.id;
-    const bill = await Bill.findById(billId);
+    console.log(`Fetching bill with ID: ${billId}`);
+    const bill = await Bill.findById(billId).populate("vendor", "_id name").populate('head', "_id name").lean();
     if (!bill) return res.status(404).json({ message: 'No Bill was found!' });
     return res.status(200).json({ bill });
   } catch (err) {
@@ -431,14 +432,135 @@ app.get("/api/credit-receipt/:id", async (req, res) => {
 
 app.post("/api/project", async (req, res) => {
   try {
-    const project = await Project.create(req.body);
-    if (!project) {
-      return res.status(400).json({ message: "Couldn't create a new Project!" })
+    console.log("Create Project");
+
+    const { name, detail, bank, inventory, status } = req.body;
+
+    // ✅ 1) REQUIRED FIELD CHECKS
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        field: "name",
+        message: "Project name is required.",
+      });
     }
-    return res.status(200).json({ project, success: true });
+
+    if (typeof name !== "string") {
+      return res.status(400).json({
+        success: false,
+        field: "name",
+        message: "Project name must be a string.",
+      });
+    }
+
+    // ✅ 2) ENUM VALIDATION
+
+    if (status && !["future", "ongoing", "completed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        field: "status",
+        message: "Invalid status. Must be future, ongoing, or completed.",
+      });
+    }
+
+    // ✅ 3) OBJECT ID VALIDATION
+
+    if (bank && !mongoose.Types.ObjectId.isValid(bank)) {
+      return res.status(400).json({
+        success: false,
+        field: "bank",
+        message: "Invalid bank ID.",
+      });
+    }
+
+    // ✅ 4) INVENTORY VALIDATION
+
+    let validatedInventory = [];
+
+    if (inventory !== undefined) {
+      if (!Array.isArray(inventory)) {
+        return res.status(400).json({
+          success: false,
+          field: "inventory",
+          message: "Inventory must be an array.",
+        });
+      }
+
+      for (let i = 0; i < inventory.length; i++) {
+        const item = inventory[i];
+
+        item.serialNo = item.serialNo ?? i + 1; // Auto-assign serialNo if not provided
+
+        if (item.floor == null) {
+          return res.status(400).json({
+            success: false,
+            field: `inventory[${i}].floor`,
+            message: "floor is required.",
+          });
+        }
+
+        if (item.size == null) {
+          return res.status(400).json({
+            success: false,
+            field: `inventory[${i}].size`,
+            message: "size is required.",
+          });
+        }
+
+        if (item.estimatedValue == null || Number(item.estimatedValue) <= 0) {
+          return res.status(400).json({
+            success: false,
+            field: `inventory[${i}].estimatedValue`,
+            message: "estimatedValue must be greater than 0.",
+          });
+        }
+
+        // ✅ sanitize each item
+        validatedInventory.push({
+          serialNo: Number(item.serialNo),
+          floor: Number(item.floor),
+          unitNo: Number(item.unitNo),
+          size: Number(item.size),
+          estimatedValue: Number(item.estimatedValue),
+          utilities: item.utilities ? Number(item.utilities) : undefined,
+          remarks: item.remarks?.trim() || "",
+        });
+      }
+    }
+
+    // ✅ 5) CREATE PROJECT
+
+    const project = await Project.create({
+      name: name.trim(),
+      detail: detail?.trim() || "",
+      bank: bank || undefined,
+      status: status || "ongoing",
+      inventory: validatedInventory,
+      inventoryCounter: validatedInventory.length,
+    });
+
+    return res.status(201).json({
+      success: true,
+      project,
+      message: "Project created successfully.",
+    });
+
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: 'Internal Server Error!' })
+
+    // ✅ Handle Mongo validation errors cleanly
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(err.errors)[0].message,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error!",
+    });
   }
 });
 
@@ -621,7 +743,6 @@ app.post("/api/debit-voucher", async (req, res) => {
       amount,
       payStatus,
       heads,
-      subHeads,
     } = req.body;
 
     // ✅ 1) REQUIRED FIELDS CHECKS (with specific messages)
@@ -780,7 +901,6 @@ app.post("/api/debit-voucher", async (req, res) => {
       bank: bank || undefined,
 
       heads: Array.isArray(heads) ? heads : [],
-      subHeads: Array.isArray(subHeads) ? subHeads : [],
     });
 
     return res.status(201).json({
@@ -1010,6 +1130,292 @@ app.post("/api/head", async (req, res) => {
     }
 
     return res.status(500).json({ message: "Internal Server Error!" });
+  }
+});
+
+// APIs (method: 'PUT')
+
+app.put("/api/bill/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { vendor, vendorBillNo, comments, head, items, totalAmount } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Bill ID" });
+    }
+
+    if (!vendor || !vendorBillNo || !head) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const updatedBill = await Bill.findByIdAndUpdate(
+      id,
+      {
+        vendor,
+        vendorBillNo,
+        comments,
+        head,
+        items,
+        totalAmount,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate('vendor').populate('head');
+
+    if (!updatedBill) {
+      return res.status(404).json({ message: "Bill not found" });
+    }
+
+    return res.status(200).json({
+      bill: updatedBill,
+      success: true,
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error!" });
+  }
+});
+
+app.put("/api/project/:id", async (req, res) => {
+  try {
+    console.log("Update Project");
+
+    const { id } = req.params;
+    const { name, detail, bank, inventory, status } = req.body;
+
+    // ✅ ID validation
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid project ID.",
+      });
+    }
+
+    // ✅ REQUIRED FIELD CHECKS
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        field: "name",
+        message: "Project name is required.",
+      });
+    }
+
+    if (typeof name !== "string") {
+      return res.status(400).json({
+        success: false,
+        field: "name",
+        message: "Project name must be a string.",
+      });
+    }
+
+    // ✅ ENUM VALIDATION
+    if (status && !["future", "ongoing", "completed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        field: "status",
+        message: "Invalid status.",
+      });
+    }
+
+    // ✅ BANK VALIDATION
+    if (bank && !mongoose.Types.ObjectId.isValid(bank)) {
+      return res.status(400).json({
+        success: false,
+        field: "bank",
+        message: "Invalid bank ID.",
+      });
+    }
+
+    // ✅ INVENTORY VALIDATION
+    let validatedInventory = [];
+
+    if (inventory !== undefined) {
+      if (!Array.isArray(inventory)) {
+        return res.status(400).json({
+          success: false,
+          message: "Inventory must be an array.",
+        });
+      }
+
+      for (let i = 0; i < inventory.length; i++) {
+        const item = inventory[i];
+
+        item.serialNo = item.serialNo ?? i + 1;
+
+        if (item.floor == null) {
+          return res.status(400).json({
+            success: false,
+            message: `inventory[${i}].floor is required.`,
+          });
+        }
+
+        if (item.size == null) {
+          return res.status(400).json({
+            success: false,
+            message: `inventory[${i}].size is required.`,
+          });
+        }
+
+        if (item.estimatedValue == null || Number(item.estimatedValue) <= 0) {
+          return res.status(400).json({
+            success: false,
+            message: `inventory[${i}].estimatedValue must be > 0.`,
+          });
+        }
+
+        validatedInventory.push({
+          serialNo: Number(item.serialNo),
+          floor: Number(item.floor),
+          unitNo: Number(item.unitNo),
+          size: Number(item.size),
+          estimatedValue: Number(item.estimatedValue),
+          utilities: item.utilities ? Number(item.utilities) : undefined,
+          remarks: item.remarks?.trim() || "",
+        });
+      }
+    }
+
+    // ✅ UPDATE PROJECT
+    const updatedProject = await Project.findByIdAndUpdate(
+      id,
+      {
+        name: name.trim(),
+        detail: detail?.trim() || "",
+        bank: bank || undefined,
+        status: status || "ongoing",
+        inventory: validatedInventory,
+        inventoryCounter: validatedInventory.length,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate('bank');
+
+    if (!updatedProject) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      project: updatedProject,
+      message: "Project updated successfully.",
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(err.errors)[0].message,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error!",
+    });
+  }
+});
+
+app.put("/api/sale/:id", async (req, res) => {
+  try {
+    const saleId = req.params.id;
+
+    if (!mongoose.isValidObjectId(saleId)) {
+      return res.status(400).json({ message: "Invalid sale ID" });
+    }
+
+    const projectId = req.body.project;
+
+    if (!mongoose.isValidObjectId(projectId)) {
+      return res.status(400).json({ message: "Project ID is not valid!" });
+    }
+
+    const project = await Project.findById(projectId).select("name");
+
+    if (!project) {
+      return res.status(404).json({ message: "No project found!" });
+    }
+
+    const projectName = project.name;
+
+    const payload = {
+      project: projectId,
+      projectName,
+      fileNo: req.body.fileNo,
+      inventory: req.body.inventory,
+      size: req.body.size,
+      saleType: req.body.saleType,
+
+      name: req.body.name,
+      fatherOrHusbandName: req.body.fatherOrHusbandName,
+      postalAddress: req.body.postalAddress,
+      residentialAddress: req.body.residentialAddress,
+      phoneNo: req.body.phoneNo,
+      email: req.body.email,
+      nationality: req.body.nationality,
+      cnic: req.body.cnic,
+
+      nomineeName: req.body.nomineeName,
+      nomineeCnic: req.body.nomineeCnic,
+      nomineeRelationship: req.body.nomineeRelationship,
+      nomineeAddress: req.body.nomineeAddress,
+
+      unitCost: req.body.unitCost,
+      utilitycharges: req.body.utilitycharges,
+      westOpen: req.body.westOpen,
+      parkFacing: req.body.parkFacing,
+      corner: req.body.corner,
+      TotalPrice: req.body.TotalPrice,
+
+      installments: req.body.installments,
+      comments: req.body.comments,
+    };
+
+    const updatedSale = await Sale.findByIdAndUpdate(
+      saleId,
+      payload,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSale) {
+      return res.status(404).json({ message: "Sale not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      sale: updatedSale,
+      message: "Sale updated successfully",
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map(e => ({
+        field: e.path,
+        message: e.message,
+      }));
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error!",
+    });
   }
 });
 
